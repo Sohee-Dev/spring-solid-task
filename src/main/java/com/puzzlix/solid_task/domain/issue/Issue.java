@@ -1,5 +1,10 @@
 package com.puzzlix.solid_task.domain.issue;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Issue {
     // pk
     // 타이틀

@@ -1,0 +1,10 @@
+### 1. 새로운 이슈 생성 (POST)
+POST http://localhost:8080/api/issues
+Content-Type: application/json
+
+{
+    "title": "HTTP Client 테스트",
+    "description": "인텔리제이에서 바로 API 테스트 하기",
+    "projectId": 1,
+    "reporterId": 1
+}
