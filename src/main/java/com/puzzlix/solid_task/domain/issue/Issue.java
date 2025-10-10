@@ -1,10 +1,16 @@
 package com.puzzlix.solid_task.domain.issue;
 
+import com.puzzlix.solid_task.domain.comment.Comment;
+import com.puzzlix.solid_task.domain.project.Project;
+import com.puzzlix.solid_task.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,13 +36,22 @@ public class Issue {
     private IssueStatus issueStatus; //시작 진행중 완료 상태(범위) - Enum 타입
 
     // 추후 연관관계 필드
-    private Long projectId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     //누가 요청(보고)
-    private Long reporterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
+    private User reporter;
 
     // 담당자(누군가에게 할당 되어 처리 됩니다)
-    private Long assigneeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
 
-
+    // 댓글
+    // 이슈는 댓글의 외래키 주인이 아님
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 }

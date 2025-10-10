@@ -14,12 +14,17 @@ public class IssueResponse {
         private final Long id;
         private final String title;
         private final IssueStatus status;
+        private final String reporterName;
 
         // 생성자를 private 선언
         private FindAll(Issue issue){
             this.id = issue.getId();
             this.title = issue.getTitle();
             this.status = issue.getIssueStatus();
+
+            // 우리는 현재 LAZY 로딩 전략 - issue 안에 포함된
+            // User를 탐색하게 되면 추가 발생 쿼리가 발생 됨 -> N+1 문제
+            this.reporterName = issue.getReporter().getName();
         }
 
         // 정적 팩토리 메서드 선언 (이녀석은 제네릭이 아님)
