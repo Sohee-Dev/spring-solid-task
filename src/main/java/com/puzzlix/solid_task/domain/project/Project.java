@@ -2,10 +2,7 @@ package com.puzzlix.solid_task.domain.project;
 
 import com.puzzlix.solid_task.domain.issue.Issue;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString(exclude = "issues")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

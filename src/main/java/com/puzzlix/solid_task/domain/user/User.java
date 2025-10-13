@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "user_table")
-@ToString
+@ToString(exclude = "issues")
 public class User {
 
     @Id
