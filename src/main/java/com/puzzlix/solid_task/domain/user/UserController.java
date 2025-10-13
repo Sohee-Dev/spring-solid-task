@@ -6,10 +6,7 @@ import com.puzzlix.solid_task.domain.user.dto.UserRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,9 +27,9 @@ public class UserController {
     // 자원 수정 --> PUT, Patch
     // 자원 삭제 --> DELETE
 
-    @PostMapping("/login")
-    public ResponseEntity<CommonResponseDto<?>> login(@Valid @RequestBody UserRequest.Login request){
-        User user = userService.login(request);
+    @PostMapping("/login/{type}")
+    public ResponseEntity<CommonResponseDto<?>> login(@PathVariable String type, @Valid @RequestBody UserRequest.Login request){
+        User user = userService.login(type, request);
 
         // 사용자 이메일을 기반으로 JWT 토큰 생성
         String token = jwtTokenProvider.createToken(user.getEmail());
