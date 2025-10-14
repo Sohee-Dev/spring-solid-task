@@ -36,6 +36,8 @@ public class UserService {
         newUser.setName(request.getName());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(encodedPassword);
+        // 기본값 USER로 셋팅
+        newUser.setRole(Role.USER);
 
         return userRepository.save(newUser);
     }
@@ -43,7 +45,7 @@ public class UserService {
     /**
      * 로그인 로직
      * @param request
-     * @return
+     * @return 로그인 전략
      * */
     @Transactional(readOnly = true)
     public User login(String type, UserRequest.Login request){
