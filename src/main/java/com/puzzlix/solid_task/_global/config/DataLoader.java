@@ -10,6 +10,7 @@ import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final IssueRepository issueRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -28,12 +30,12 @@ public class DataLoader implements CommandLineRunner {
         // User 2개, Project 1개
         // Issue 샘플 만들어보기
 
-        User testUser1 = userRepository.save(new User(null, "홍길동", "test1@naver.com", "1234",new ArrayList<>()));
-        User testUser2 = userRepository.save(new User(null, "이순신", "test2@naver.com", "1234",new ArrayList<>()));
+        User testUser1 = userRepository.save(new User(null, "홍길동", "test1@naver.com", passwordEncoder.encode("1234") ,new ArrayList<>()));
+        User testUser2 = userRepository.save(new User(null, "이순신", "test2@naver.com", passwordEncoder.encode("1234"),new ArrayList<>()));
 
         Project testProject = projectRepository.save(new Project(null, "SOLID Task 프로젝트", "SOLID 개념 학습", new ArrayList<>()));
 
         issueRepository.save(new Issue(null, "로그인 기능 구현", "JWT 필요", IssueStatus.TODO, testProject, testUser1, null, new ArrayList<>()));
-        issueRepository.save(new Issue(null, "검색 기능 구현 요청", "이슈 전체 목록에 검색 기능이 필요합니다", IssueStatus.TODO, testProject, testUser1, null, new ArrayList<>()));
+        issueRepository.save(new Issue(null, "검색 기능 구현 요청", "이슈 전체 목록에 검색 기능이 필요합니다", IssueStatus.TODO, testProject, testUser2, null, new ArrayList<>()));
     }
 }
