@@ -32,7 +32,7 @@ public class UserController {
         User user = userService.login(type, request);
 
         // 사용자 이메일을 기반으로 JWT 토큰 생성
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user);
 
         return ResponseEntity.ok(CommonResponseDto.success(token, "로그인에 성공 했습니다"));
     }

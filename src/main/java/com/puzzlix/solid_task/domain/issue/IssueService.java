@@ -3,6 +3,7 @@ package com.puzzlix.solid_task.domain.issue;
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
+import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,36 @@ public class IssueService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+    public Issue updateIssueStatus(Long issueId, IssueStatus status, String requestUserEmail, Role userRole){
+        // 인가 처리
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(()-> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
+
+        // 관리자가 아니거나 담당자가 아니면 상태를 변경 못함
+        if(userRole != Role.ADMIN && issue.getAssignee().getEmail().equals(requestUserEmail)){
+            throw new SecurityException("이슈 상태를 변경할 권한이 없습니다");
+        }
+        // 더티 체킹
+        issue.setIssueStatus(status);
+        return issue;
+    }
 
     // 이슈 업데이트
-    public Issue updateIssue(Long issueId, IssueRequest.Update request){
+    public Issue updateIssue(Long issueId, IssueRequest.Update request, String requestUserEmail){
+        User requestUser = userRepository.findByEmail(requestUserEmail)
+                .orElseThrow(() -> new NoSuchElementException("요청한 사용자를 찾을 수 없습니다"));
+
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
+
+        // 인가 처리 -> 관리자라면 수정 가능 하게 변경
+        // 인가 로직
+        boolean isAdmin = requestUser.getRole() == Role.ADMIN;
+        boolean isReporter = requestUser.getId().equals(issue.getReporter().getId());
+
+        if(!isAdmin && !isReporter){
+            throw new SecurityException("이슈를 수정할 권한이 없습니다");
+        }
 
         // 넘어온 값이 담당자 할당 여부에 따로 분기 처리 되어야 함
         if(request.getAssigneeId() != null){
@@ -35,6 +61,8 @@ public class IssueService {
             // 담당자 할당
             issue.setAssignee(null);
         }
+
+
         issue.setTitle(request.getTitle());
         issue.setDescription(request.getDescription());
 
@@ -44,12 +72,26 @@ public class IssueService {
     }
 
     // 이슈 삭제 로직
-    public void deleteIssue(Long issueId){
-        if(!issueRepository.existsById(issueId)){
-            throw new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다");
+    // 인가 처리 ADMIN만 삭제 가능
+    public void deleteIssue(Long issueId, String requestUserEmail){
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
+
+        // 1. 이메일로 사용자 조회
+        // 2. 사용자의 ROLE 확인 해서 ADMIN 일 경우 삭제 가능
+        // 3. 추가 로직 - 보고자(Reporter)도 삭제할 수 있는 기능을 추가(실수로 등록 시 삭제 할 수 있도록)
+        User user = userRepository.findByEmail(requestUserEmail)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다"));
+
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        boolean isReporter = issue.getReporter().getEmail().equals(user.getEmail());
+
+        if(!isAdmin || !isReporter){
+            throw new SecurityException("삭제 할 권한이 없습니다");
         }
-        // 추후 고민...
+
         issueRepository.deleteById(issueId);
+        // 추후 고민...
     }
 
     // 이슈 생성 로직

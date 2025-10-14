@@ -3,6 +3,7 @@ package com.puzzlix.solid_task.domain.issue;
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
+import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -62,7 +63,7 @@ public class IssueServiceTest {
         request.setReporterId(1L);
 
         //2. Repository 조회 시 반환 될 가짜 객체 엔티티 준비
-        User mockReporter = new User(1L, "홍길동", "test@test.com", "1234", null);
+        User mockReporter = new User(1L, "홍길동", "test@test.com", "1234", Role.USER, null);
         Project mockProject = new Project(1L, "솔리드 테스크", "설명 설명", null);
 
         // Mock 객체는 기본적으로 빈 껍데기 이다. 실제 동작처럼 시나리오로 미리 작성해주어야 한다.

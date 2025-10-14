@@ -23,6 +23,10 @@ public class User {
     private String email;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @OneToMany(mappedBy = "reporter")
     private List<Issue> issues = new ArrayList<>();
 }

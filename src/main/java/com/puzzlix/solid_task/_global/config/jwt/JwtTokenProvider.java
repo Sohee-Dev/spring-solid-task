@@ -1,5 +1,7 @@
 package com.puzzlix.solid_task._global.config.jwt;
 
+import com.puzzlix.solid_task.domain.user.Role;
+import com.puzzlix.solid_task.domain.user.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -31,12 +33,13 @@ public class JwtTokenProvider {
         this.validityInMilliseconds = validityInMilliseconds;
     }
 
-    public String createToken(String email){
+    public String createToken(User user){
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getEmail())
+                .claim("role", user.getRole().name())
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(key)
@@ -73,6 +76,15 @@ public class JwtTokenProvider {
      * */
     public String getSubject(String token){
         return parseClaims(token).getSubject();
+    }
+
+    /**
+     * 전체 토큰에서 사용자 역할(ROLE)을 추출 하는 기능
+     * @return 추출된 사용자 ROLE(Role)
+     * */
+    public Role getRole(String token){
+        String roleStr = parseClaims(token).get("role", String.class);
+        return Role.valueOf(roleStr); // 자동으로 String 값에 맞는 USER, ADMIN 반환
     }
 
     /**
