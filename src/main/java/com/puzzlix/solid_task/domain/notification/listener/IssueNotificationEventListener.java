@@ -23,6 +23,7 @@ public class IssueNotificationEventListener {
     public void handleIssueStatusChangeEvent(IssueStatusChangedEvent event){
         Issue issue = event.getIssue();
         String message = "이슈 #" + issue.getTitle() + " 의 상태가 " + issue.getIssueStatus() + "로 변경 되었습니다";
+        // String message = "메세지 API 테스트";
 
         // 돈이 나가는 일이기 때문에 방어적 코드 작성
         if("DONE".equalsIgnoreCase(issue.getIssueStatus().name())){

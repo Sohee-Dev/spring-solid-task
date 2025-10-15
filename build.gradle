@@ -47,6 +47,9 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	// 3. jjwt-jackson: JSON 파서
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	// 문자 api
+	implementation 'com.solapi:sdk:1.0.3'
 }
 
 tasks.named('test') {
