@@ -1,12 +1,14 @@
 package com.puzzlix.solid_task.domain.issue;
 
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
+import com.puzzlix.solid_task.domain.issue.event.IssueStatusChangedEvent;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
 import com.puzzlix.solid_task.domain.user.Role;
 import com.puzzlix.solid_task.domain.user.User;
 import com.puzzlix.solid_task.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ public class IssueService {
     private final IssueRepository issueRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    // 이벤트 발생자(스프링이 제공)
+    // 이 객체를 통해서 터플리케이션의 다른 부분에 "어떤 이벤트가 발생 했다" 라는 것을 알릴 수 있다.
+    private final ApplicationEventPublisher eventPublisher;
 
     public Issue updateIssueStatus(Long issueId, IssueStatus status, String requestUserEmail, Role userRole){
         // 인가 처리
@@ -34,6 +39,10 @@ public class IssueService {
         }
         // 더티 체킹
         issue.setIssueStatus(status);
+        if(status == IssueStatus.DONE){
+            // 이벤트 발생(방송)
+            eventPublisher.publishEvent(new IssueStatusChangedEvent(issue));
+        }
         return issue;
     }
 

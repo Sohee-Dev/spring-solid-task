@@ -42,3 +42,8 @@ spring:
 jwt:
   secret: 'VGhpc0lzQVNlY3JldEtleUZvckpXVFNhZmUhIT8xMjM0NTY='
   expiration-in-ms: 3600000 # 1시간
+
+notification:
+  policy:
+    # 이슈 상태가 DONE 으로 변경되었을 때 사용할 알림 타입 지정
+    on-status-done: EMAIL
