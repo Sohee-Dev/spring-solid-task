@@ -1,5 +1,6 @@
 package com.puzzlix.solid_task.domain.user;
 
+import com.puzzlix.solid_task.domain.board.Board;
 import com.puzzlix.solid_task.domain.issue.Issue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,4 +30,7 @@ public class User {
 
     @OneToMany(mappedBy = "reporter")
     private List<Issue> issues = new ArrayList<>();
+
+    @OneToMany(mappedBy = "writer")
+    private List<Board> boards = new ArrayList<>();
 }
