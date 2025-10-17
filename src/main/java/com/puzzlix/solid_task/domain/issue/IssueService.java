@@ -1,6 +1,7 @@
 package com.puzzlix.solid_task.domain.issue;
 
 import com.puzzlix.solid_task.domain.issue.dto.IssueRequest;
+import com.puzzlix.solid_task.domain.issue.dto.IssueResponse;
 import com.puzzlix.solid_task.domain.issue.event.IssueStatusChangedEvent;
 import com.puzzlix.solid_task.domain.project.Project;
 import com.puzzlix.solid_task.domain.project.ProjectRepository;
@@ -28,7 +29,7 @@ public class IssueService {
     // 이 객체를 통해서 터플리케이션의 다른 부분에 "어떤 이벤트가 발생 했다" 라는 것을 알릴 수 있다.
     private final ApplicationEventPublisher eventPublisher;
 
-    public Issue updateIssueStatus(Long issueId, IssueStatus status, String requestUserEmail, Role userRole){
+    public IssueResponse.FindById updateIssueStatus(Long issueId, IssueStatus status, String requestUserEmail, Role userRole){
         // 인가 처리
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(()-> new NoSuchElementException("해당 ID의 이슈를 찾을 수 없습니다"));
@@ -43,11 +44,11 @@ public class IssueService {
             // 이벤트 발생(방송)
             eventPublisher.publishEvent(new IssueStatusChangedEvent(issue));
         }
-        return issue;
+        return new IssueResponse.FindById(issue);
     }
 
     // 이슈 업데이트
-    public Issue updateIssue(Long issueId, IssueRequest.Update request, String requestUserEmail){
+    public IssueResponse.FindById updateIssue(Long issueId, IssueRequest.Update request, String requestUserEmail){
         User requestUser = userRepository.findByEmail(requestUserEmail)
                 .orElseThrow(() -> new NoSuchElementException("요청한 사용자를 찾을 수 없습니다"));
 
@@ -77,7 +78,7 @@ public class IssueService {
 
         // JPA 변경 감지(Dirty Checking 덕분에 save() 명시적으로 호출 하지 않아도
         // 트랜잭션이 끝날 때 변경된 내용이 DB에 자동으로 반영 된다.
-        return issue;
+        return new IssueResponse.FindById(issue);
     }
 
     // 이슈 삭제 로직
@@ -104,7 +105,7 @@ public class IssueService {
     }
 
     // 이슈 생성 로직
-    public Issue createIssue(IssueRequest.Create request){
+    public IssueResponse.FindById createIssue(IssueRequest.Create request){
 
         // 보고자 ID -> 실제 회원이 있는가?
         User reporter = userRepository.findById(request.getReporterId())
@@ -120,13 +121,15 @@ public class IssueService {
         newIssue.setProject(project);
         // 이슈 --> TODO
         newIssue.setIssueStatus(IssueStatus.TODO);
+        issueRepository.save(newIssue);
 
-        return issueRepository.save(newIssue);
+        return new IssueResponse.FindById(newIssue);
     }
 
     // 모든 이슈 조회
     @Transactional(readOnly = true)
-    public List<Issue> findIssues(){
-        return issueRepository.findAll();
+    public List<IssueResponse.FindAll> findIssues(){
+        List<Issue> issues = issueRepository.findAll();
+        return IssueResponse.FindAll.from(issues);
     }
 }

@@ -33,11 +33,10 @@ public class IssueController {
             @RequestAttribute("userRole") Role userRole
     ){
 
-        Issue issue = issueService.updateIssueStatus(issueId, newStatus, userEmail, userRole);
-        // 서비스 호출 -
-        IssueResponse.FindById responseDto = new IssueResponse.FindById(issue);
+        IssueResponse.FindById issue = issueService.updateIssueStatus(issueId, newStatus, userEmail, userRole);
+        // 서비스 호출
         return ResponseEntity.ok(CommonResponseDto
-                .success(responseDto, "이슈 상태가 성공적으로 변경 되었습니다"));
+                .success(issue, "이슈 상태가 성공적으로 변경 되었습니다"));
     }
 
 
@@ -51,10 +50,10 @@ public class IssueController {
             @RequestBody IssueRequest.Update request,
             @RequestAttribute("userEmail") String userEmail) {
 
-        Issue issue =  issueService.updateIssue(id, request, userEmail);
-        IssueResponse.FindById findByIdDto = new IssueResponse.FindById(issue);
+        IssueResponse.FindById issue =  issueService.updateIssue(id, request, userEmail);
+
         return ResponseEntity
-                .ok(CommonResponseDto.success(findByIdDto,
+                .ok(CommonResponseDto.success(issue,
                         "이슈가 성공적으로 변경 되었습니다"));
     }
 
@@ -81,9 +80,9 @@ public class IssueController {
      * POST /api/issues
      * */
     @PostMapping
-    public ResponseEntity<CommonResponseDto<Issue>> createIssue(@RequestBody IssueRequest.Create request){
+    public ResponseEntity<?> createIssue(@RequestBody IssueRequest.Create request){
 
-       Issue createdIssue = issueService.createIssue(request);
+       IssueResponse.FindById createdIssue = issueService.createIssue(request);
 
        return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponseDto.success(createdIssue));
     }
@@ -95,10 +94,8 @@ public class IssueController {
     @GetMapping
     public ResponseEntity<CommonResponseDto<List<IssueResponse.FindAll>>> getIssues(){
         // 서비스에서 조회 요청
-        List<Issue> issues = issueService.findIssues();
-
-        // 조회된 도메인 이슈 리스트를 DTO로 변환
-        List<IssueResponse.FindAll> responseDtos = IssueResponse.FindAll.from(issues);
+        // 조회된 도메인 이슈 리스트를 DTO로 변환 --> Service에서 DTO로 반환하도록 변경
+        List<IssueResponse.FindAll> responseDtos = issueService.findIssues();
 
         return ResponseEntity.ok(CommonResponseDto.success(responseDtos));
     }
